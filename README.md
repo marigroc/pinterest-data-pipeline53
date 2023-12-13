@@ -158,7 +158,18 @@ To perform batch processing of data on Databricks, it is essential to establish 
      - Removing null values.
      - Replacing values wherever necessary.
      - Converting datatypes as needed.
+4. **Automation with AWS MWAA (Managed Workflows for Apache Airflow):**
+   - Create an API token in Databricks.
+   - Initialize a connection between MWAA and Databricks.
 
+5. **DAG (Directed Acyclic Graph) Creation:**
+   - Develop a DAG file in Python specifying:
+     - Notebook path to be used from Databricks.
+     - Cluster ID in AWS.
+
+6. **Customization for Scheduled Runs:**
+   - Customize the DAG to run at regular intervals based on the rate of incoming data.
+   - At the specified intervals, the notebook specified in the DAG will run automatically, executing the defined queries.
 ### Data Analysis
 The code in the file batch_querries.ipynb provides the results for the eight tasks listed:
 1. The most popular Pinterest category, people post to, based on their country.
