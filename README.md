@@ -73,7 +73,7 @@ Executing the script initializes a database connector class that establishes a c
 The run_infinite_post_data_loop() method continuously cycles at random intervals between 0 and 2 seconds. During each iteration, it selects all columns of a random row from each of the three tables and compiles the data into dictionaries. These dictionaries are then printed to the console.
 
 ##  Utilized Tools
-
+![The diagram of the architecture used in the project.](image-26.png)
 ### Apache Kafka
 Apache Kafka is an event streaming platform. 
 
