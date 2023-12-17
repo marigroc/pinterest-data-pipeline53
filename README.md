@@ -2,10 +2,35 @@
 
 ## Table of Contents
 - [Description](#description)
-- [Installation](#installation)
-- [Usage](#usage)
+- [Project Dependencies](#project-dependencies)
+- [The dataset](#the-dataset)
+- [Utilized Tools](#utilized-tools)
+  - [Apache Kafka](#apache-kafka)
+  - [AWS MSK (Amazon Managed Streaming for Apache Kafka)](#aws-msk-amazon-managed-streaming-for-apache-kafka)
+  - [AWS MSK Connect](#aws-msk-connect)
+  - [Kafka REST Proxy](#kafka-rest-proxy)
+  - [AWS API Gateway](#aws-api-gateway)
+  - [Apache Spark](#apache-spark)
+  - [PySpark](#pyspark)
+  - [Databricks](#databricks)
+- [Set-up](#set-up)
+  - [Setting up the EC2 instance & Apache Kafka](#setting-up-the-ec2-instance--apache-kafka)
+  - [Connecting MSK Cluster to an S3 Bucket](#connecting-msk-cluster-to-an-s3-bucket)
+  - [Configuring API in AWS API Gateway](#configuring-api-in-aws-api-gateway)
+  - [Setting up Kafka REST Proxy on the EC2 Client](#setting-up-kafka-rest-proxy-on-the-ec2-client)
+- [Batch processing](#batch-processing)
+  - [Data Cleaning](#data-cleaning)
+  - [Data Analysis](#data-analysis)
+- [Stream Processing](#stream-processing)
+  - [Creating data streams with Kinesis](#creating-data-streams-with-kinesis)
+  - [Configure an API with Kinesis proxy integration](#configure-an-api-with-kinesis-proxy-integration)
+  - [Create user_posting_emulation_stream.py](#create-user_posting_emulation_streampy)
+  - [Read data from Kinesis streams in Databricks](#read-data-from-kinesis-streams-in-databricks)
+  - [Data Cleaning](#data-cleaning-1)
+  - [Write the data to Delta Tables](#write-the-data-to-delta-tables)
 - [File Structure](#file-structure)
 - [License](#license)
+
 
 ## Description
 
@@ -17,6 +42,16 @@ The whole process I have split into three parts:
 - set-up,
 - batch processing,
 - streaming processing.
+
+During this process, I gained proficiency in:
+
+- Apache Kafka: An event streaming platform.
+- AWS MSK (Amazon Managed Streaming for Apache Kafka): Fully managed service for Apache Kafka.
+- AWS MSK Connect: Simplifies streaming data to/from Apache Kafka clusters.
+- Kafka REST Proxy: Provides a RESTful interface to Kafka clusters.
+- AWS API Gateway: Manages, monitors, and secures APIs.
+- Apache Spark and PySpark: Multi-language engine for data engineering and machine learning.
+- Databricks: Platform for Spark processing of batch and streaming data. 
 
 ##  Project Dependencies
 
@@ -129,7 +164,7 @@ Detailed process is described in the corresponding prerequisite lessons. Here ar
 3. **API Configuration in AWS API Gateway:**
    - In the previously created API in AWS API Gateway:
      - Choose HTTP Proxy as the Integration type.
-     - Set the Endpoint URL to your Kafka Client Amazon EC2 Instance PublicDNS.
+     - Set the Endpoint URL to your Kafka Client Amazon EC2 Instance PublicDNS and include the ":8082" port number.
 
 4. **API Deployment:**
    - Deploy the API to obtain the invoke URL.
@@ -208,12 +243,111 @@ The code in the file batch_querries.ipynb provides the results for the eight tas
 
 ![Alt text](image-12.png)
 
+## Stream Processing
+
+### Creating data streams with Kinesis
+First, create three streams on AWS Kinesis for pin, geo, and user data.
+1. In the Kinesis dashboard, select 'Create data stream'.
+2. Give the stream a name (streaming-<user_id>-pin, streaming-<user_id>-geo, streaming-<user_id>-user), and select 'Provisioned' capacity mode.
+3. Create data stream.
+
+### Configure an API with Kinesis proxy integration
+In order to interact with the Kinesis streams using HTTP requests create new API resources on AWS API Gateway.
+
+1. Create resource /streams:
+   - In "Resource name" type 'streams'
+2. Create a GET method in /streams resource with the following configuration (amend the Execution role with your kinesis access role):
+![Alt text](image-13.png)<br>
+3. In the 'Integration Request' tab click 'Edit' and add the following:
+![Alt text](image-14.png)<br>
+4. In /streams create another resource - a child resource - and call it '/{stream-name}'.
+5. In /{stream-name} create DELETE, GET, and POST methods with the following configuration:
+   - DELETE:<br>
+   ![DeleteStream](image-15.png)<br>
+   ![{
+    "StreamName": "$input.params('stream-name')"
+}](image-17.png)<br>
+   - GET:<br>
+   ![DescribeStream](image-18.png)<br>
+   ![{
+    "StreamName": "$input.params('stream-name')"
+}](image-19.png)<br>
+   -POST:<br>
+   ![POST	CreateStream](image-20.png)<br>
+   ![{
+    "ShardCount": #if($input.path('$.ShardCount') == '') 5 #else $input.path('$.ShardCount') #end,
+    "StreamName": "$input.params('stream-name')"
+}](image-21.png)<br>
+6. In /{stream-name} create two more child resources: /record, and /records using the same config as before.
+7. In /record create PUT method using the configuration below:<br>
+![record	PUT	PutRecord](image-22.png) <br>
+![{
+    "StreamName": "$input.params('stream-name')",
+    "Data": "$util.base64Encode($input.json('$.Data'))",
+    "PartitionKey": "$input.path('$.PartitionKey')"
+}](image-23.png) <br>
+8. In /records create PUT method using the configuration below:<br>
+![records	PUT	PutRecords](image-24.png) <br>
+![{
+    "StreamName": "$input.params('stream-name')",
+    "Records": [
+       #foreach($elem in $input.path('$.records'))
+          {
+            "Data": "$util.base64Encode($elem.data)",
+            "PartitionKey": "$elem.partition-key"
+          }#if($foreach.hasNext),#end
+        #end
+    ]
+}](image-25.png) <br>
+### Create user_posting_emulation_stream.py
+Based on the user_posting_emulation.py you have to create a Python script to send requests to your API, which adds one record at a time to the streams you have created. You should send data from the three Pinterest tables to their corresponding Kinesis streams.
+
+### Read data from Kinesis streams in Databricks
+Create a Notebook in Databricks and follow the same process as with the batch processing to read the authentication_credentials.csv, ingest data into Kinesis Data Streams, and read date from the three streams in Databricks Notebook.
+
+### Data Cleaning
+Using the same methods as with the batch data, clean the streaming data.
+
+### Write the data to Delta Tables
+After cleaning of the streaming data save each stream in a Delta Table named <user_id>_pin_table, <user_id>_geo_table, <user_id>_user_table.
+
 ## File Structure
 
-Add relevant file structure details here.
+Your main project folder should have the following structure:
+
+- [images](images/) - Folder containing images used in the documentation.
+- [.gitignore](.gitignore) - Git ignore file to specify untracked files and directories.
+- [0abb070c336b_dag.py](0abb070c336b_dag.py) - DAG (Directed Acyclic Graph) file for Apache Airflow.
+- [0abb070c336-key-pair.pem](0abb070c336-key-pair.pem) - Key pair file for authentication.
+- [batch_data_cleaning.ipynb](batch_data_cleaning.ipynb) - Jupyter Notebook for batch data cleaning using PySpark.
+- [batch_querries.ipynb](batch_querries.ipynb) - Jupyter Notebook containing queries for batch data analysis using PySpark.
+- [README.md](README.md) - Main documentation file.
+- [streaming_data.ipynb](streaming_data.ipynb) - Jupyter Notebook for streaming data processing.
+- [user_posing_emulation.py](user_posing_emulation.py) - Python script for emulating user posting data.
+- [user_posting_emulation_streaming.py](user_posting_emulation_streaming.py) - Python script for emulating user posting data with streaming.
 ##  License
 
-Include license information here.
+MIT License
+
+Copyright (c) 2023 lmash
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
 
 
