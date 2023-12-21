@@ -329,7 +329,7 @@ Your main project folder should have the following structure:
 
 MIT License
 
-Copyright (c) 2023 lmash
+Copyright (c) 2023 marigroc
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
