@@ -65,12 +65,12 @@ To execute this project, you must have the following modules installed:
 
 To replicate the type of data commonly handled by Pinterest's engineers, this project includes a script, user_posting_emulation.py, which, when executed from the terminal, simulates a flow of random data points resembling those received by the Pinterest API during user data upload POST requests.
 
-Executing the script initializes a database connector class that establishes a connection to an AWS RDS database. The database comprises three tables:
+The script initializes a database connector class that establishes an AWS RDS database connection. The database comprises three tables:
 
 - pinterest_data: Contains information about posts being uploaded to Pinterest.
 - geolocation_data: Holds data about the geolocation of each Pinterest post found in pinterest_data.
 - user_data: Stores information about the user who uploaded each post present in pinterest_data.
-The run_infinite_post_data_loop() method continuously cycles at random intervals between 0 and 2 seconds. During each iteration, it selects all columns of a random row from each of the three tables and compiles the data into dictionaries. These dictionaries are then printed to the console.
+The run_infinite_post_data_loop() method continuously cycles between 0 and 2 seconds at random intervals. During each iteration, it selects all columns of a random row from each table and compiles the data into dictionaries. These dictionaries are then printed to the console.
 
 ##  Utilized Tools
 ![The diagram of the architecture used in the project.](image-26.png)
@@ -87,10 +87,10 @@ MSK Connect is a feature of Amazon MSK that simplifies streaming data to and fro
 The Confluent REST Proxy provides a RESTful interface to an Apache Kafka® cluster, making it easy to produce and consume messages, view the state of the cluster, and perform administrative actions without using the native Kafka protocol or clients.
 
 ### AWS API Gateway
-Amazon API Gateway is a fully managed service facilitating the creation, publication, maintenance, monitoring, and securing of APIs at any scale. APIs act as the "front door" for applications to access data, business logic, or functionality from your backend services.
+Amazon API Gateway is a fully managed service facilitating the creation, publication, maintenance, monitoring, and securing of APIs at any scale. APIs are the "front door" for applications to access data, business logic, or functionality from your backend services.
 
 ### Apache Spark
-Apache Spark™ is a multi-language engine for executing data engineering, data science, and machine learning on single-node machines or clusters. 
+Apache Spark™ is a multi-language engine executing data engineering, data science, and machine learning on single-node machines or clusters. 
 
 ### PySpark
 PySpark is the Python API for Apache Spark. It enables real-time, large-scale data processing in a distributed environment using Python. 
@@ -102,10 +102,10 @@ This project uses the Databricks platform to perform Spark processing of batch a
 
 ### Setting up the EC2 instance & Apache Kafka
 
-EC2 instances serve as the foundational components of cloud computing. Essentially, they are remote computers capable of executing code either on a cluster or a single machine. Access to an EC2 instance can be obtained through a terminal.
+EC2 instances serve as the foundational components of cloud computing. They are remote computers capable of executing code on a cluster or a single machine. Access to an EC2 instance can be obtained through a terminal.
 
 ### AWS EC2 Instance Setup Steps:
-Detailed process is described in the corresponding prerequisite lessons. Here are the general steps:
+The detailed process is described in the corresponding prerequisite lessons. Here are the general steps:
 1. **Key Pair File Creation:**
    - In the AWS console, create a key-pair file for authentication.
 
@@ -129,7 +129,7 @@ Detailed process is described in the corresponding prerequisite lessons. Here ar
 7. **Creation of Kafka Topics:**
    - Create three Kafka topics on the Kafka EC2 client machine for three tables. Utilize the Bootstrap server string and Apache Zookeeper connection string obtained from the MSK cluster.
 ### Connecting MSK Cluster to an S3 Bucket
-Detailed process is described in the corresponding prerequisite lessons. Here are the general steps:
+The detailed process is described in the corresponding prerequisite lessons. Here are the general steps:
 1. **Amazon S3 Bucket Creation:**
    - In the Amazon S3 console, create an S3 bucket. This bucket will serve as the destination for data extracted from Amazon RDS.
 
@@ -143,7 +143,7 @@ Detailed process is described in the corresponding prerequisite lessons. Here ar
    - Create a connector using the custom plug-in, associating it with the IAM role previously created. This connector will enable the extraction and storage of data from Amazon RDS to the specified S3 bucket.
 
 ### Configuring API in AWS API Gateway
-Detailed process is described in the corresponding prerequisite lessons. Here are the general steps:
+The detailed process is described in the corresponding prerequisite lessons. Here are the general steps:
 1. **AWS API Gateway Setup:**
    - Create an API in AWS API Gateway using the REST API configuration.
 
@@ -154,7 +154,7 @@ Detailed process is described in the corresponding prerequisite lessons. Here ar
    - Establish flexibility in handling various HTTP methods by creating an ANY method for the chosen proxy resource.
 
 ### Setting up Kafka REST Proxy on the EC2 Client
-Detailed process is described in the corresponding prerequisite lessons. Here are the general steps:
+The detailed process is described in the corresponding prerequisite lessons. Here are the general steps:
 1. **Confluent Package Installation:**
    - Install the Confluent package for the Kafka REST proxy on the EC2 client.
 
@@ -173,7 +173,7 @@ Detailed process is described in the corresponding prerequisite lessons. Here ar
    - Utilize a Python script for data emulation, sending data to the Kafka topics using the API Invoke URL.
 
 6. **Data Storage in S3 Bucket:**
-   - Finally, store the data into the previously created S3 Bucket in JSON format using the Kafka REST proxy and the API Invoke URL.
+   - Finally, store the data in the previously created S3 Bucket in JSON format using the Kafka REST proxy and the API Invoke URL.
 
 ##  Batch processing
 ### Data Cleaning
@@ -192,7 +192,7 @@ To perform batch processing of data on Databricks, it is essential to establish 
      - Renaming and re-ordering columns when necessary.
      - Removing null values.
      - Replacing values wherever necessary.
-     - Converting datatypes as needed.
+     - Converting data types as needed.
 4. **Automation with AWS MWAA (Managed Workflows for Apache Airflow):**
    - Create an API token in Databricks.
    - Initialize a connection between MWAA and Databricks.
@@ -203,70 +203,68 @@ To perform batch processing of data on Databricks, it is essential to establish 
      - Cluster ID in AWS.
 
 6. **Customization for Scheduled Runs:**
-   - Customize the DAG to run at regular intervals based on the rate of incoming data.
+   - Customize the DAG to run regularly based on the incoming data rate.
    - At the specified intervals, the notebook specified in the DAG will run automatically, executing the defined queries.
 ### Data Analysis
 The code in the file batch_querries.ipynb provides the results for the eight tasks listed:
-1. The most popular Pinterest category, people post to, based on their country.
+1. People post to the most popular Pinterest category based on their country.<br>
 
 ![Alt text](image-4.png)
-
-2. Number of posts each category had between 2018 and 2022 and most popular category in each year.
-
+<br>
+2. Number of posts each category had between 2018 and 2022 and the most popular category in each year.
+<br>
 ![Alt text](image-2.png)
-
+<br>
 3. The user with the most followers for each country
-
+<br>
 ![Alt text](image-5.png)
-
-- The country with the user with most followers.
-
+<br>
+- The country with the user with the most followers.
+<br>
 ![Alt text](image-6.png)
-
+<br>
 4. The most popular category people post to, based on the age groups - 18-24, 25-35, 36-50, +50
-
+<br>
 ![Alt text](image-7.png)
-
-5. The median follower count for users in the age groups, 18-24, 25-35, 36-50, +50
-
+<br>
+5. The median follower count for users in the age groups 18-24, 25-35, 36-50, +50
+<br>
 ![Alt text](image-8.png)
-
-6. How many users have joined between 2015 and 2020.
-
+<br>
+6. How many users have joined between 2015 and 2020?
+<br>
 ![Alt text](image-10.png)
-
+<br>
 7. The median follower count of users who have joined between 2015 and 2020.
-
+<br>
 ![Alt text](image-11.png)
-
-8. The median follower count of users who have joined between 2015 and 2020, based on age group that they are part of.
-
+<br>
+8. The median follower count of users who joined between 2015 and 2020 is based on the age group they are part of.
+<br>
 ![Alt text](image-12.png)
-
+<br>
 ## Stream Processing
 
 ### Creating data streams with Kinesis
 First, create three streams on AWS Kinesis for pin, geo, and user data.
 1. In the Kinesis dashboard, select 'Create data stream'.
 2. Give the stream a name (streaming-<user_id>-pin, streaming-<user_id>-geo, streaming-<user_id>-user), and select 'Provisioned' capacity mode.
-3. Create data stream.
+3. Create a data stream.
 
 ### Configure an API with Kinesis proxy integration
-In order to interact with the Kinesis streams using HTTP requests create new API resources on AWS API Gateway.
+To interact with the Kinesis streams using HTTP requests, create new API resources on AWS API Gateway.
 
-1. Create resource /streams:
-   - In "Resource name" type 'streams'
-2. Create a GET method in /streams resource with the following configuration (amend the Execution role with your kinesis access role):
+1. Create resources /streams:
+   - In "Resource name", type 'streams'
+2. Create a GET method in /streams resource with the following configuration (amend the Execution role with your kinesis access role):<br>
 ![Alt text](image-13.png)<br>
-3. In the 'Integration Request' tab click 'Edit' and add the following:
+3. In the 'Integration Request' tab click 'Edit' and add the following:<br>
 ![Alt text](image-14.png)<br>
 4. In /streams create another resource - a child resource - and call it '/{stream-name}'.
 5. In /{stream-name} create DELETE, GET, and POST methods with the following configuration:
    - DELETE:<br>
    ![DeleteStream](image-15.png)<br>
-   ![{
-    "StreamName": "$input.params('stream-name')"
-}](image-17.png)<br>
+   ![{"StreamName": "$input.params('stream-name')"}](image-17.png)<br>
    - GET:<br>
    ![DescribeStream](image-18.png)<br>
    ![{
@@ -278,7 +276,7 @@ In order to interact with the Kinesis streams using HTTP requests create new API
     "ShardCount": #if($input.path('$.ShardCount') == '') 5 #else $input.path('$.ShardCount') #end,
     "StreamName": "$input.params('stream-name')"
 }](image-21.png)<br>
-6. In /{stream-name} create two more child resources: /record, and /records using the same config as before.
+6. In /{stream-name} create two more child resources: /record, and /records using the same config as before.<br>
 7. In /record create PUT method using the configuration below:<br>
 ![record	PUT	PutRecord](image-22.png) <br>
 ![{
@@ -300,16 +298,16 @@ In order to interact with the Kinesis streams using HTTP requests create new API
     ]
 }](image-25.png) <br>
 ### Create user_posting_emulation_stream.py
-Based on the user_posting_emulation.py you have to create a Python script to send requests to your API, which adds one record at a time to the streams you have created. You should send data from the three Pinterest tables to their corresponding Kinesis streams.
+Based on the user_posting_emulation.py, you have to create a Python script to send requests to your API, which adds one record at a time to the streams you have made. You should send data from the three Pinterest tables to their corresponding Kinesis streams.
 
 ### Read data from Kinesis streams in Databricks
-Create a Notebook in Databricks and follow the same process as with the batch processing to read the authentication_credentials.csv, ingest data into Kinesis Data Streams, and read date from the three streams in Databricks Notebook.
+Create a Notebook in Databricks and follow the same process as the batch processing to read the authentication_credentials.csv, ingest data into Kinesis Data Streams, and read data from the three streams in Databricks Notebook.
 
 ### Data Cleaning
-Using the same methods as with the batch data, clean the streaming data.
+Clean the streaming data using the same methods as with the batch data.
 
 ### Write the data to Delta Tables
-After cleaning of the streaming data save each stream in a Delta Table named <user_id>_pin_table, <user_id>_geo_table, <user_id>_user_table.
+After cleaning the streaming data, save each stream in a Delta Table named <user_id>_pin_table, <user_id>_geo_table, <user_id>_user_table.
 
 ## File Structure
 
@@ -329,8 +327,6 @@ Your main project folder should have the following structure:
 
 MIT License
 
-Copyright (c) 2023 lmash
-
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -341,7 +337,7 @@ furnished to do so, subject to the following conditions:
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+THE SOFTWARE IS PROVIDED "AS IS"WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
