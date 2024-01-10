@@ -5,6 +5,7 @@ import requests
 import sqlalchemy
 from time import sleep
 from sqlalchemy import text
+import yaml
 
 # Set seed for reproducibility
 random.seed(100)
@@ -17,11 +18,16 @@ class AWSDBConnector:
         """
         Initializes the AWSDBConnector with database connection details.
         """
-        self.HOST = "pinterestdbreadonly.cq2e8zno855e.eu-west-1.rds.amazonaws.com"
-        self.USER = 'project_user'
-        self.PASSWORD = ':t%;yCY3Yjg'
-        self.DATABASE = 'pinterest_data'
-        self.PORT = 3306
+        self.db_creds = self.read_db_creds()
+        
+    def read_db_creds(self):
+        try:
+            with open('db_creds.yaml', 'r') as yaml_file:
+                db_creds = yaml.safe_load(yaml_file)
+                return db_creds
+        except FileNotFoundError:
+            print("db_creds.yaml file not found. Make sure to create it with the correct credentials.")
+            return {}
         
     def create_db_connector(self):
         """
@@ -30,7 +36,7 @@ class AWSDBConnector:
         Returns:
             sqlalchemy.engine.base.Engine: Database engine.
         """
-        engine = sqlalchemy.create_engine(f"mysql+pymysql://{self.USER}:{self.PASSWORD}@{self.HOST}:{self.PORT}/{self.DATABASE}?charset=utf8mb4")
+        engine = sqlalchemy.create_engine(f"mysql+pymysql://{self.db_creds['USER']}:{self.db_creds['PASSWORD']}@{self.db_creds['HOST']}:{self.db_creds['PORT']}/{self.db_creds['DATABASE']}?charset=utf8mb4")
         return engine
 
 class DateTimeEncoder(json.JSONEncoder):
