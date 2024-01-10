@@ -314,7 +314,7 @@ After cleaning the streaming data, save each stream in a Delta Table named <user
 
 Your main project folder should have the following structure:
 
-- [images](images/) - Folder containing images used in the documentation.
+- [images](images/) - All images used in the documentation.
 - [.gitignore](.gitignore) - Git ignore file to specify untracked files and directories.
 - [0abb070c336b_dag.py](0abb070c336b_dag.py) - DAG (Directed Acyclic Graph) file for Apache Airflow.
 - [0abb070c336-key-pair.pem](0abb070c336-key-pair.pem) - Key pair file for authentication.
