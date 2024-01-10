@@ -210,42 +210,43 @@ The code in the file batch_querries.ipynb provides the results for the eight tas
 1. People post to the most popular Pinterest category based on their country.<br>
 
 ![Alt text](image-4.png)
-<br>
-2. Number of posts each category had between 2018 and 2022 and the most popular category in each year.
-<br>
+
+2. Number of posts each category had between 2018 and 2022 and the most popular category in each year.<br>
+
 ![Alt text](image-2.png)
-<br>
-3. The user with the most followers for each country
-<br>
+
+3. The user with the most followers for each country<br>
+
 ![Alt text](image-5.png)
-<br>
-- The country with the user with the most followers.
-<br>
+
+- The country with the user with the most followers.<br>
+
 ![Alt text](image-6.png)
-<br>
-4. The most popular category people post to, based on the age groups - 18-24, 25-35, 36-50, +50
-<br>
+
+4. The most popular category people post to, based on the age groups - 18-24, 25-35, 36-50, +50<br>
+
 ![Alt text](image-7.png)
-<br>
-5. The median follower count for users in the age groups 18-24, 25-35, 36-50, +50
-<br>
+
+5. The median follower count for users in the age groups 18-24, 25-35, 36-50, +50<br>
+
 ![Alt text](image-8.png)
-<br>
-6. How many users have joined between 2015 and 2020?
-<br>
+
+6. How many users have joined between 2015 and 2020?<br>
+
 ![Alt text](image-10.png)
-<br>
-7. The median follower count of users who have joined between 2015 and 2020.
-<br>
+
+7. The median follower count of users who have joined between 2015 and 2020.<br>
+
 ![Alt text](image-11.png)
-<br>
-8. The median follower count of users who joined between 2015 and 2020 is based on the age group they are part of.
-<br>
+
+8. The median follower count of users who joined between 2015 and 2020 is based on the age group they are part of.<br>
+
 ![Alt text](image-12.png)
-<br>
+
 ## Stream Processing
 
 ### Creating data streams with Kinesis
+
 First, create three streams on AWS Kinesis for pin, geo, and user data.
 1. In the Kinesis dashboard, select 'Create data stream'.
 2. Give the stream a name (streaming-<user_id>-pin, streaming-<user_id>-geo, streaming-<user_id>-user), and select 'Provisioned' capacity mode.
