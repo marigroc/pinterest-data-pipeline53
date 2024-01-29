@@ -306,7 +306,7 @@ Create a Notebook in Databricks and follow the same process as the batch process
 
 ### Data Cleaning
 Clean the streaming data using the same methods as with the batch data.
-
+<br>
 ### Write the data to Delta Tables
 After cleaning the streaming data, save each stream in a Delta Table named <user_id>_pin_table, <user_id>_geo_table, <user_id>_user_table.
 
@@ -315,7 +315,7 @@ After cleaning the streaming data, save each stream in a Delta Table named <user
 Your main project folder should have the following structure:
 
 - [images](images/) - All images used in the documentation.
-- [.gitignore](.gitignore) - Git ignore file to specify untracked files and directories.
+- [.gitignore](.gitignore) - Gitignore file to specify untracked files and directories.
 - [0abb070c336b_dag.py](0abb070c336b_dag.py) - DAG (Directed Acyclic Graph) file for Apache Airflow.
 - [0abb070c336-key-pair.pem](0abb070c336-key-pair.pem) - Key pair file for authentication.
 - [batch_data_cleaning.ipynb](batch_data_cleaning.ipynb) - Jupyter Notebook for batch data cleaning using PySpark.
